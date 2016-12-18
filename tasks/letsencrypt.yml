@@ -29,7 +29,12 @@
     update: yes
 
 - name: Make directories for certificates
-  file: path={{ letsencrypt_dir }}/{{ item.name }} state=directory
+  file:
+    path: "{{ letsencrypt_dir }}/{{ item.name }}"
+    state: directory
+    owner: "{{ item.user|default(omit) }}"
+    group : "{{ item.group|default(omit) }}"
+    mode: go-rwx
   with_items: "{{ letsencrypt_certs }}"
 
 - name: Create account key
