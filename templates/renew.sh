@@ -10,3 +10,11 @@ cat signed.crt ../lets-encrypt-x3-cross-signed.pem > chained.crt
 if [ -s /etc/init.d/apache2 ]; then
     /etc/init.d/apache2 reload
 fi
+
+if [ -s /etc/init.d/dovecot ]; then
+    /etc/init.d/dovecot reload
+fi
+
+if [ -s /etc/init.d/postfix ]; then
+    /etc/init.d/postfix reload
+fi
