@@ -1,0 +1,3 @@
+letsencrypt_dir: /etc/ssl/letsencrypt
+letsencrypt_challenge_dir: /var/www/letsencrypt
+letsencrypt_enable_apache_catchall: False
