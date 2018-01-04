@@ -64,7 +64,7 @@
   with_items: "{{ letsencrypt_certs }}"
 
 - name: Run certificate generation if subdomains have changed
-  command: "{{ letsencrypt_dir }}/{{ item.1.name }}/renew.sh"
+  shell: "cd {{ letsencrypt_dir }}/{{ item.1.name }} && rm -f signed.crt && ./renew.sh"
   with_indexed_items: "{{ letsencrypt_certs }}"
   when: openssl_config_changed.results[item.0]|changed
 
