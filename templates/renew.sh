@@ -24,13 +24,13 @@ pkill -f -9 "python3 -m http.server 80" || true
 rm -rf serve
 
 if [ -s /etc/init.d/apache2 ]; then
-    /etc/init.d/apache2 reload
+    ansible --connection=local -i localhost, -m service -a "name=apache2 state=reloaded" localhost > /dev/null
 fi
 
 if [ -s /etc/init.d/dovecot ]; then
-    /etc/init.d/dovecot reload
+    ansible --connection=local -i localhost, -m service -a "name=dovecot state=reloaded" localhost > /dev/null
 fi
 
 if [ -s /etc/init.d/postfix ]; then
-    /etc/init.d/postfix reload
+    ansible --connection=local -i localhost, -m service -a "name=postfix state=reloaded" localhost > /dev/null
 fi
