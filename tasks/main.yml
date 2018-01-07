@@ -1,2 +1,2 @@
- - include: letsencrypt.yml
+ - import_tasks: letsencrypt.yml
    tags: letsencrypt
