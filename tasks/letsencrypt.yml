@@ -1,3 +1,6 @@
+- name: Install git
+  package: name=git state=present
+
 - name: Install apache letsencrypt-catchall
   copy: src=letsencrypt.conf dest=/etc/apache2/conf-available/letsencrypt.conf
   when: letsencrypt_enable_apache_catchall
@@ -22,10 +25,10 @@
     url: https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem
     dest: "{{ letsencrypt_dir }}/lets-encrypt-x3-cross-signed.pem"
 
-- name: Clone acme-tiny
+- name: Clone dehydrated
   git:
-    repo: https://github.com/diafygi/acme-tiny.git
-    dest: "{{ letsencrypt_dir }}/acme-tiny"
+    repo: https://github.com/lukas2511/dehydrated.git
+    dest: "{{ letsencrypt_dir }}/dehydrated"
     update: yes
 
 - name: Make directories for certificates
@@ -37,36 +40,38 @@
     mode: go-rwx
   with_items: "{{ letsencrypt_certs }}"
 
-- name: Create account key
-  shell: openssl genrsa 4096 > {{ letsencrypt_dir }}/{{ item.name }}/account.key
-  args:
-    creates: "{{ letsencrypt_dir }}/{{ item.name }}/account.key"
-  with_items: "{{ letsencrypt_certs }}"
-
 - name: Create private key
   command: openssl genrsa -out {{ letsencrypt_dir }}/{{ item.name }}/domain.key 2048 -sha256
   args:
     creates: "{{ letsencrypt_dir }}/{{ item.name }}/domain.key"
   with_items: "{{ letsencrypt_certs }}"
 
-- name: Create openssl config file for csr
-  template: src=openssl.cnf dest={{ letsencrypt_dir }}/{{ item.name }}
-  with_items: "{{ letsencrypt_certs }}"
-  register: openssl_config_changed
-
-- name: Create csr
-  shell: openssl req -new -sha256 -key {{ letsencrypt_dir }}/{{ item.1.name }}/domain.key -subj "/" -reqexts SAN -config {{ letsencrypt_dir }}/{{ item.1.name }}/openssl.cnf > {{ letsencrypt_dir }}/{{ item.1.name }}/domain.csr
-  with_indexed_items: "{{ letsencrypt_certs }}"
-  when: openssl_config_changed.results[item.0]|changed
-
 - name: Create renew script
   template: src=renew.sh dest={{ letsencrypt_dir }}/{{ item.name }}/renew.sh mode=o+x
   with_items: "{{ letsencrypt_certs }}"
 
-- name: Run certificate generation if subdomains have changed
-  shell: "cd {{ letsencrypt_dir }}/{{ item.1.name }} && rm -f signed.crt && ./renew.sh"
+- name: Create dehydrated.conf
+  template: src=dehydrated.conf dest={{ letsencrypt_dir }}/{{ item.name }}/dehydrated.conf
+  with_items: "{{ letsencrypt_certs }}"
+
+- name: Register account
+  command: ../dehydrated/dehydrated --register --accept-terms --config dehydrated.conf
+  args:
+    chdir: "{{ letsencrypt_dir }}/{{ item.name }}"
+    creates: "{{ letsencrypt_dir }}/{{ item.name }}/accounts"
+  with_items: "{{ letsencrypt_certs }}"
+
+- name: Run certificate generation (dehydrated checks the expiry date, otherwise we would regenerate certs on every ansible deploy!)
+  shell: "cd {{ letsencrypt_dir }}/{{ item.1.name }} && ./renew.sh"
   with_indexed_items: "{{ letsencrypt_certs }}"
-  when: openssl_config_changed.results[item.0]|changed
+  register: renew_result
+  changed_when: "'Skipping renew' not in renew_result.stdout and renew_result.stdout != ''"
 
 - name: Create renew cronjob
   template: src=cron dest=/etc/cron.d/letsencrypt
+
+- name: Remove deprecated files
+  file: path={{ letsencrypt_dir }}/{{ item[0].name }}/{{ item[1] }} state=absent
+  with_nested:
+    - "{{ letsencrypt_certs }}"
+    - [ 'domain.csr', 'openssl.cnf' ]

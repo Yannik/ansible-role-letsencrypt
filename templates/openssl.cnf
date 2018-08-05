@@ -1,6 +1,0 @@
-[ req ]
-distinguished_name = req_distinguished_name
-[ req_distinguished_name ]
-[ san ]
-[SAN]
-subjectAltName={% for subdomain in item.subdomains %}DNS:{{ subdomain }}{% if not loop.last %},{% endif %}{% endfor %}
