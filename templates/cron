@@ -1,1 +1,1 @@
-*/5 * * * * root { {% for cert in letsencrypt_certs %}{{ letsencrypt_dir }}/{{ cert.name }}/renew.sh{% if not loop.last %} && {% endif %}{% endfor %} } > /dev/null
+*/5 * * * * root { {% for cert in letsencrypt_certs %}{{ letsencrypt_dir }}/{{ cert.name }}/renew.sh{% if not loop.last %} && {% endif %}{% endfor %}; } > /dev/null
