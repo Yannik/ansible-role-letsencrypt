@@ -15,7 +15,8 @@ fi
 
 ../dehydrated/dehydrated --cron --config dehydrated.conf {% for subdomain in item.subdomains %}--domain {{ subdomain }} {% endfor %} --alias {{ item.name }}
 
-cat certs/{{ item.name }}/cert.pem > signed.crt
+cp certs/{{ item.name }}/cert.pem signed.crt
+cp certs/{{ item.name }}/privkey.pem domain.key
 cat signed.crt ../lets-encrypt-x3-cross-signed.pem > chained.crt
 cat chained.crt domain.key > chained_cert+key.pem
 
