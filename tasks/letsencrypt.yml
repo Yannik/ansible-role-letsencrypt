@@ -1,5 +1,9 @@
-- name: Install git
-  package: name=git state=present
+- name: Install git, curl and lsof
+  package: name={{ item }} state=present
+  with_items:
+    - git
+    - lsof
+    - curl
 
 - name: Install apache letsencrypt-catchall
   copy: src=letsencrypt.conf dest=/etc/apache2/conf-available/letsencrypt.conf
