@@ -1,7 +1,20 @@
 #!/usr/bin/env bash
 set -o errexit
 set -o pipefail
+set -o errtrace
 set -o nounset
+
+function finish {
+    # https://stackoverflow.com/questions/5719030/bash-silently-kill-background-function-process
+    for x in $(pgrep -f "python3 -m http.server 80"); do
+        kill $x
+	wait $x 2>/dev/null
+    done
+    rm -rf serve
+}
+trap finish EXIT
+trap finish ERR
+
 
 cd {{ letsencrypt_dir }}/{{ item.name }}
 
@@ -24,17 +37,14 @@ cp certs/{{ item.name }}/privkey.pem domain.key
 cat signed.crt ../lets-encrypt-x3-cross-signed.pem > chained.crt
 cat chained.crt domain.key > chained_cert+key.pem
 
-pkill -f -9 "python3 -m http.server 80" || true
-rm -rf serve
-
 if [ -s /etc/init.d/apache2 ]; then
-    ansible --connection=local -i localhost, -m service -a "name=apache2 state=reloaded" localhost > /dev/null || true
+    systemctl reload apache2 || true
 fi
 
 if [ -s /etc/init.d/dovecot ]; then
-    ansible --connection=local -i localhost, -m service -a "name=dovecot state=reloaded" localhost > /dev/null || true
+    systemctl reload dovecot || true
 fi
 
 if [ -s /etc/init.d/postfix ]; then
-    ansible --connection=local -i localhost, -m service -a "name=postfix state=reloaded" localhost > /dev/null || true
+    systemctl reload postfix || true
 fi
