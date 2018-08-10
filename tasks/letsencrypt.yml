@@ -50,13 +50,14 @@
     creates: "{{ letsencrypt_dir }}/{{ item.name }}/domain.key"
   with_items: "{{ letsencrypt_certs }}"
 
-- name: Create renew script
-  template: src=renew.sh dest={{ letsencrypt_dir }}/{{ item.name }}/renew.sh mode=o+x
-  with_items: "{{ letsencrypt_certs }}"
-
 - name: Create dehydrated.conf
   template: src=dehydrated.conf dest={{ letsencrypt_dir }}/{{ item.name }}/dehydrated.conf
   with_items: "{{ letsencrypt_certs }}"
+
+- name: Create renew script
+  template: src=renew.sh dest={{ letsencrypt_dir }}/{{ item.name }}/renew.sh mode=o+x
+  with_items: "{{ letsencrypt_certs }}"
+  register: renew_script_result
 
 - name: Register account
   command: ../dehydrated/dehydrated --register --accept-terms --config dehydrated.conf
@@ -68,6 +69,7 @@
 - name: Run certificate generation (dehydrated checks the expiry date, otherwise we would regenerate certs on every ansible deploy!)
   shell: "cd {{ letsencrypt_dir }}/{{ item.1.name }} && ./renew.sh"
   with_indexed_items: "{{ letsencrypt_certs }}"
+  when: renew_script_result.results[item.0]|changed
   register: renew_result
   changed_when: "'Skipping renew' not in renew_result.stdout and renew_result.stdout != ''"
 
