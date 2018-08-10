@@ -6,7 +6,8 @@ set -o nounset
 cd {{ letsencrypt_dir }}/{{ item.name }}
 
 # do nothing if certificate is valid for more than 31 days (31*24*60*60)
-[ -s signed.crt ] && openssl x509 -noout -in signed.crt -checkend 2678400 > /dev/null && exit
+[[ -s signed.crt && ! -f "force" ]] && openssl x509 -noout -in signed.crt -checkend 2678400 > /dev/null && exit
+rm -f force
 
 if ! lsof -i:80 > /dev/null; then
     mkdir -p serve/.well-known

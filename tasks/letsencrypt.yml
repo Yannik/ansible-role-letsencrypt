@@ -67,7 +67,7 @@
   with_items: "{{ letsencrypt_certs }}"
 
 - name: Run certificate generation (dehydrated checks the expiry date, otherwise we would regenerate certs on every ansible deploy!)
-  shell: "cd {{ letsencrypt_dir }}/{{ item.1.name }} && ./renew.sh"
+  shell: "cd {{ letsencrypt_dir }}/{{ item.1.name }} && touch force && ./renew.sh"
   with_indexed_items: "{{ letsencrypt_certs }}"
   when: renew_script_result.results[item.0]|changed
   register: renew_result
