@@ -22,6 +22,7 @@ cd {{ letsencrypt_dir }}/{{ item.name }}
 [[ -s signed.crt && ! -f "force" ]] && openssl x509 -noout -in signed.crt -checkend 2678400 > /dev/null && exit
 rm -f force
 
+{% if item.challenge|default('http-01') == 'http-01' %}
 if ! lsof -i:80 > /dev/null; then
     mkdir -p serve/.well-known
     ln -sf "{{ letsencrypt_challenge_dir }}" serve/.well-known/acme-challenge
@@ -29,8 +30,9 @@ if ! lsof -i:80 > /dev/null; then
     python3 -m http.server 80 > /dev/null &
     cd ..
 fi
+{% endif %}
 
-../dehydrated/dehydrated --cron --config dehydrated.conf {% for subdomain in item.subdomains %}--domain {{ subdomain }} {% endfor %} --alias {{ item.name }}
+../dehydrated/dehydrated --cron --config dehydrated.conf {% for subdomain in item.subdomains %}--domain {{ subdomain }} {% endfor %} --alias {{ item.name }} {% for hook in item.hooks %}--hook {{ hook }} {% endfor %} --challenge {{ item.challenge|default('http-01') }}
 
 cp certs/{{ item.name }}/cert.pem signed.crt
 cp certs/{{ item.name }}/privkey.pem domain.key
