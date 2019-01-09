@@ -45,7 +45,7 @@
   with_items: "{{ letsencrypt_certs }}"
 
 - name: Create private key
-  command: openssl genrsa -out {{ letsencrypt_dir }}/{{ item.name }}/domain.key 2048 -sha256
+  command: openssl genrsa -out {{ letsencrypt_dir }}/{{ item.name }}/domain.key 2048
   args:
     creates: "{{ letsencrypt_dir }}/{{ item.name }}/domain.key"
   with_items: "{{ letsencrypt_certs }}"
