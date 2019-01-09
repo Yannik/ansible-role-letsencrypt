@@ -54,6 +54,11 @@
   template: src=dehydrated.conf dest={{ letsencrypt_dir }}/{{ item.name }}/dehydrated.conf
   with_items: "{{ letsencrypt_certs }}"
 
+- name: Create acme-dns hook
+  template: src=acme-dns-hook.sh dest={{ letsencrypt_dir }}/{{ item.name }}/acme-dns-hook.sh mode=o+x
+  when: item.subdomains|selectattr('acme_domain_id', 'defined')|list|length > 0
+  with_items: "{{ letsencrypt_certs }}"
+
 - name: Create renew script
   template: src=renew.sh dest={{ letsencrypt_dir }}/{{ item.name }}/renew.sh mode=o+x
   with_items: "{{ letsencrypt_certs }}"

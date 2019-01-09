@@ -32,7 +32,12 @@ if ! lsof -i:80 > /dev/null; then
 fi
 {% endif %}
 
-../dehydrated/dehydrated --cron --config dehydrated.conf {% for subdomain in item.subdomains %}--domain {{ subdomain }} {% endfor %} --alias {{ item.name }} {% for hook in item.hooks %}--hook {{ hook }} {% endfor %} --challenge {{ item.challenge|default('http-01') }}
+../dehydrated/dehydrated --cron --config dehydrated.conf \
+    --alias {{ item.name }} \
+    {% for subdomain in item.subdomains %}--domain {{ subdomain.name }} {% endfor %} \
+    {% for hook in item.hooks|default([]) %}--hook {{ hook }} {% endfor %} \
+    {% for subdomain in item.subdomains|selectattr('acme_domain_id', 'defined') %}--hook ./acme-dns-hook.sh {% endfor %} \
+    --challenge {{ item.challenge|default('http-01') }}
 
 cp certs/{{ item.name }}/cert.pem signed.crt
 cp certs/{{ item.name }}/privkey.pem domain.key
