@@ -22,7 +22,7 @@
   file: path={{ letsencrypt_dir }} state=directory
 
 - name: Create acme-challenge dir
-  file: path={{ letsencrypt_challenge_dir }} state=directory
+  file: path={{ letsencrypt_challenge_dir }} state=directory mode=o+x
 
 - name: Download letsencrypt intermediate
   get_url:
