@@ -56,3 +56,7 @@ fi
 if [ -s /etc/init.d/postfix ]; then
     systemctl reload postfix || true
 fi
+
+if [ -s /etc/init.d/lighttpd ]; then
+    systemctl restart lighttpd || true
+fi
