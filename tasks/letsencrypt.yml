@@ -50,6 +50,14 @@
     creates: "{{ letsencrypt_dir }}/{{ item.name }}/domain.key"
   with_items: "{{ letsencrypt_certs }}"
 
+- name: Set user/group of private key
+  file:
+    path: "{{ letsencrypt_dir }}/{{ item.name }}/domain.key"
+    owner: "{{ item.user|default(omit) }}"
+    group : "{{ item.group|default(omit) }}"
+    mode: go-rwx
+  with_items: "{{ letsencrypt_certs }}"
+
 - name: Create dehydrated.conf
   template: src=dehydrated.conf dest={{ letsencrypt_dir }}/{{ item.name }}/dehydrated.conf
   with_items: "{{ letsencrypt_certs }}"
