@@ -10,11 +10,15 @@ case "$ACTION" in
 	case "$DOMAIN" in
 {% for subdomain in item.subdomains|selectattr('acme_domain_id', 'defined') %}
             "{{ subdomain.name }}")
-                curl --silent -X POST \
+                result=$(curl --silent -X POST \
                   -H "X-Api-User: {{ subdomain.acme_user }}" \
                   -H "X-Api-Key: {{ subdomain.acme_pass }}" \
                   -d "{\"subdomain\": \"{{ subdomain.acme_domain_id }}\", \"txt\": \"$TOKEN\"}" \
-                  $SERVER
+                  $SERVER)
+		if echo $result | jq -e '.error' > /dev/null; then
+		    echo "Error: $result"
+		    exit 1
+		fi
             ;;
 {% endfor %}
         esac

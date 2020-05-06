@@ -1,10 +1,11 @@
-- name: Install git, lsof, curl and moreutils
+- name: Install git, lsof, curl, moreutils and jq
   package: name={{ item }} state=present
   with_items:
     - git
     - lsof
     - curl
     - moreutils
+    - jq
 
 - name: Install apache letsencrypt-catchall
   copy: src=letsencrypt.conf dest=/etc/apache2/conf-available/letsencrypt.conf
