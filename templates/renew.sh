@@ -60,3 +60,5 @@ fi
 if [ -s /etc/init.d/lighttpd ]; then
     systemctl restart lighttpd || true
 fi
+
+exit 0
