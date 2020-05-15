@@ -6,7 +6,7 @@ set -o nounset
 
 function finish {
     # https://stackoverflow.com/questions/5719030/bash-silently-kill-background-function-process
-    for x in $(pgrep -f "python3 -m http.server 80"); do
+    for x in $(pgrep -f "python3 -m http.server 80" || true); do
         kill $x
 	wait $x 2>/dev/null
     done
