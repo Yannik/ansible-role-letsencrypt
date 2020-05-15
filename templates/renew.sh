@@ -4,7 +4,7 @@ set -o pipefail
 set -o errtrace
 set -o nounset
 
-function finish {
+function cleanup {
     # https://stackoverflow.com/questions/5719030/bash-silently-kill-background-function-process
     for x in $(pgrep -f "python3 -m http.server 80" || true); do
         kill $x
@@ -12,9 +12,18 @@ function finish {
     done
     rm -rf serve
 }
-trap finish EXIT
-trap finish ERR
+function handle_error {
+    >&2 echo "An error occured!"
+    cleanup
+    exit 1
+}
+function handle_exit {
+    cleanup
+    exit 0
+}
 
+trap handle_exit EXIT
+trap handle_error ERR
 
 cd {{ letsencrypt_dir }}/{{ item.name }}
 
@@ -60,5 +69,3 @@ fi
 if [ -s /etc/init.d/lighttpd ]; then
     systemctl restart lighttpd || true
 fi
-
-exit 0
