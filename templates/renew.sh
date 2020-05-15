@@ -8,7 +8,7 @@ function finish {
     # https://stackoverflow.com/questions/5719030/bash-silently-kill-background-function-process
     for x in $(pgrep -f "python3 -m http.server 80" || true); do
         kill $x
-	wait $x 2>/dev/null
+        wait $x 2>/dev/null || true
     done
     rm -rf serve
 }
