@@ -17,12 +17,7 @@ function handle_error {
     cleanup
     exit 1
 }
-function handle_exit {
-    cleanup
-    exit 0
-}
 
-trap handle_exit EXIT
 trap handle_error ERR
 
 cd {{ letsencrypt_dir }}/{{ item.name }}
@@ -69,3 +64,5 @@ fi
 if [ -s /etc/init.d/lighttpd ]; then
     systemctl restart lighttpd || true
 fi
+
+cleanup
