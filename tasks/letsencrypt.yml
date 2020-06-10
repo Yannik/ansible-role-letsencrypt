@@ -10,7 +10,11 @@
 - name: Install apache letsencrypt-catchall
   copy: src=letsencrypt.conf dest=/etc/apache2/conf-available/letsencrypt.conf
   when: letsencrypt_enable_apache_catchall
-  notify: reload apache2
+  reigster: letsencrypt_apache2_catchall
+
+- name: Reload apache2
+  service: name=apache2 state=reloaded
+  when: letsencrypt_apache2_catchall is changed
 
 - name: Enable apache letsencrypt-catchall
   file:
