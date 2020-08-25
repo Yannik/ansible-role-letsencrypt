@@ -12,17 +12,16 @@
   when: letsencrypt_enable_apache_catchall
   register: letsencrypt_apache2_catchall
 
-- name: Reload apache2
-  service: name=apache2 state=reloaded
-  when: letsencrypt_apache2_catchall is changed
-
 - name: Enable apache letsencrypt-catchall
   file:
     src: "/etc/apache2/conf-available/letsencrypt.conf"
     dest: "/etc/apache2/conf-enabled/letsencrypt.conf"
     state: link
   when: letsencrypt_enable_apache_catchall
-  notify: reload apache2
+
+- name: Reload apache2
+  service: name=apache2 state=reloaded
+  when: letsencrypt_apache2_catchall is changed
 
 - name: Create letsencrypt dir
   file: path={{ letsencrypt_dir }} state=directory
