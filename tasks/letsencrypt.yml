@@ -72,6 +72,17 @@
   when: item.subdomains|selectattr('acme_domain_id', 'defined')|list|length > 0
   with_items: "{{ letsencrypt_certs }}"
 
+- name: Create hook dir
+  file:
+    path: "{{ letsencrypt_dir }}/hooks"
+    state: directory
+
+- name: Copy hooks
+  copy:
+    src: "{{ letsencrypt_hooks_path }}"
+    dest: "{{ letsencrypt_dir }}/hooks"
+    mode: +x
+
 - name: Create renew script
   template: src=renew.sh dest={{ letsencrypt_dir }}/{{ item.name }}/renew.sh mode=o+x
   with_items: "{{ letsencrypt_certs }}"
