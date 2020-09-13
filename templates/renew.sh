@@ -40,8 +40,7 @@ fi
     --alias {{ item.name }} \
     {% for subdomain in item.subdomains|selectattr('name', 'defined') %}--domain {{ subdomain.name }} {% endfor %} \
     {% for subdomain in item.subdomains|selectattr('name', 'undefined') %}--domain {{ subdomain }} {% endfor %} \
-    {% for hook in item.hooks|default([]) %}--hook {{ hook }} {% endfor %} \
-    {% for subdomain in item.subdomains|selectattr('acme_domain_id', 'defined') %}--hook ./acme-dns-hook.sh {% endfor %} \
+    --hook ./multihook.sh \
     --challenge {{ item.challenge|default('http-01') }}
 
 cp certs/{{ item.name }}/cert.pem signed.crt

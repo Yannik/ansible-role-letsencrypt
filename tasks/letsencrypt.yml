@@ -68,8 +68,20 @@
   with_items: "{{ letsencrypt_certs }}"
 
 - name: Create acme-dns hook
-  template: src=acme-dns-hook.sh dest={{ letsencrypt_dir }}/{{ item.name }}/acme-dns-hook.sh mode=o+x
+  template:
+    src: acme-dns-hook.sh
+    dest: "{{ letsencrypt_dir }}/{{ item.name }}/acme-dns-hook.sh"
+    owner: "{{ item.user|default(omit) }}"
+    mode: u+x
   when: item.subdomains|selectattr('acme_domain_id', 'defined')|list|length > 0
+  with_items: "{{ letsencrypt_certs }}"
+
+- name: Create multihook script
+  template:
+    src: multihook.sh
+    dest: "{{ letsencrypt_dir }}/{{ item.name }}/multihook.sh"
+    owner: "{{ item.user|default(omit) }}"
+    mode: u+x
   with_items: "{{ letsencrypt_certs }}"
 
 - name: Create hook dir
@@ -81,7 +93,7 @@
   copy:
     src: "{{ letsencrypt_hooks_path }}"
     dest: "{{ letsencrypt_dir }}/hooks"
-    mode: +x
+    mode: +rx
 
 - name: Create renew script
   template: src=renew.sh dest={{ letsencrypt_dir }}/{{ item.name }}/renew.sh mode=o+x
