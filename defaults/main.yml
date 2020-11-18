@@ -3,3 +3,5 @@ letsencrypt_challenge_dir: /var/www/letsencrypt
 letsencrypt_certs: []
 letsencrypt_enable_apache_catchall: False
 letsencrypt_hooks_path: ../../../files/letsencrypt-hooks/{{ inventory_hostname }}/
+# rsa|prime256v1|secp384r1
+letsencrypt_key_algo: rsa

@@ -41,6 +41,7 @@ fi
     {% for subdomain in item.subdomains|selectattr('name', 'defined') %}--domain {{ subdomain.name }} {% endfor %} \
     {% for subdomain in item.subdomains|selectattr('name', 'undefined') %}--domain {{ subdomain }} {% endfor %} \
     --hook ./multihook.sh \
+    --algo {{ item.key_algo|default(letsencrypt_key_algo) }} \
     --challenge {{ item.challenge|default('http-01') }}
 
 cp certs/{{ item.name }}/cert.pem signed.crt
