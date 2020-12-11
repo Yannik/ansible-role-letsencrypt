@@ -29,11 +29,6 @@
 - name: Create acme-challenge dir
   file: path={{ letsencrypt_challenge_dir }} state=directory mode=o+x
 
-- name: Download letsencrypt intermediate
-  get_url:
-    url: https://letsencrypt.org/certs/lets-encrypt-r3.pem
-    dest: "{{ letsencrypt_dir }}/lets-encrypt-r3.pem"
-
 - name: Clone dehydrated
   git:
     repo: https://github.com/lukas2511/dehydrated.git
