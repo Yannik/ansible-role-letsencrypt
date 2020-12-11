@@ -31,8 +31,8 @@
 
 - name: Download letsencrypt intermediate
   get_url:
-    url: https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem
-    dest: "{{ letsencrypt_dir }}/lets-encrypt-x3-cross-signed.pem"
+    url: https://letsencrypt.org/certs/lets-encrypt-r3.pem
+    dest: "{{ letsencrypt_dir }}/lets-encrypt-r3.pem"
 
 - name: Clone dehydrated
   git:
