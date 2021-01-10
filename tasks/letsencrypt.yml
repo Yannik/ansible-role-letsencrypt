@@ -48,6 +48,12 @@
   template: src=dehydrated.conf dest={{ letsencrypt_dir }}/{{ item.name }}/dehydrated.conf
   with_items: "{{ letsencrypt_certs }}"
 
+- name: Copy python HTTPServer
+  copy:
+    src: HTTPServer.py
+    dest: "{{ letsencrypt_dir }}/"
+    mode: 0755
+
 - name: Create acme-dns hook
   template:
     src: acme-dns-hook.sh

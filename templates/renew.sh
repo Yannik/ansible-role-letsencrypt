@@ -6,7 +6,7 @@ set -o nounset
 
 function cleanup {
     # https://stackoverflow.com/questions/5719030/bash-silently-kill-background-function-process
-    for x in $(pgrep -f "python3 -m http.server 80" || true); do
+    for x in $(pgrep -f "python3 {{ letsencrypt_dir }}/HTTPServer.py" || true); do
         kill $x
         wait $x 2>/dev/null || true
     done
@@ -31,7 +31,7 @@ if ! lsof -i:80 > /dev/null; then
     mkdir -p serve/.well-known
     ln -sf "{{ letsencrypt_challenge_dir }}" serve/.well-known/acme-challenge
     cd serve
-    python3 -m http.server 80 > /dev/null &
+    python3 "{{ letsencrypt_dir }}/HTTPServer.py" &
     cd ..
 fi
 {% endif %}
