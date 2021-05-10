@@ -49,6 +49,13 @@ cp certs/{{ item.name }}/privkey.pem domain.key
 cp certs/{{ item.name }}/fullchain.pem chained.crt
 cat chained.crt domain.key > chained_cert+key.pem
 
+{% if item.user is defined %}
+chown -R {{ item.user }} certs signed.crt domain.key chained.crt chained_cert+key.pem
+{% endif %}
+{% if item.group is defined %}
+chgrp -R {{ item.user }} certs signed.crt domain.key chained.crt chained_cert+key.pem
+{% endif %}
+
 if [ -s /etc/init.d/apache2 ]; then
     systemctl reload apache2 || true
 fi

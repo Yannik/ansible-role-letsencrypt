@@ -58,7 +58,6 @@
   template:
     src: acme-dns-hook.sh
     dest: "{{ letsencrypt_dir }}/{{ item.name }}/acme-dns-hook.sh"
-    owner: "{{ item.user|default(omit) }}"
     mode: u+x
   when: item.subdomains|selectattr('acme_domain_id', 'defined')|list|length > 0
   with_items: "{{ letsencrypt_certs }}"
@@ -67,7 +66,6 @@
   template:
     src: multihook.sh
     dest: "{{ letsencrypt_dir }}/{{ item.name }}/multihook.sh"
-    owner: "{{ item.user|default(omit) }}"
     mode: u+x
   with_items: "{{ letsencrypt_certs }}"
 
