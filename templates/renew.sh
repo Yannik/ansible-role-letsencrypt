@@ -42,14 +42,16 @@ fi
 
 cp certs/{{ item.name }}/cert.pem signed.crt
 cp certs/{{ item.name }}/privkey.pem domain.key
-cat signed.crt certs/{{ item.name }}/chain.pem > chained.crt
+cp certs/{{ item.name }}/chain.pem chain.pem
+cp certs/{{ item.name }}/fullchain.pem fullchain.pem
+cat signed.crt chain.pem > chained.crt
 cat chained.crt domain.key > chained_cert+key.pem
 
 {% if item.user is defined %}
-chown -R {{ item.user }} certs signed.crt domain.key chained.crt chained_cert+key.pem
+chown -R {{ item.user }} certs signed.crt domain.key chained.crt chain.pem fullchain.pem chained_cert+key.pem
 {% endif %}
 {% if item.group is defined %}
-chgrp -R {{ item.user }} certs signed.crt domain.key chained.crt chained_cert+key.pem
+chgrp -R {{ item.user }} certs signed.crt domain.key chained.crt chain.pem fullchain.pem chained_cert+key.pem
 {% endif %}
 
 if [ -s /etc/init.d/apache2 ]; then
