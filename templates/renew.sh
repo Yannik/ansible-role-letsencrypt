@@ -42,7 +42,7 @@ fi
 
 cp certs/{{ item.name }}/cert.pem signed.crt
 cp certs/{{ item.name }}/privkey.pem domain.key
-cp certs/{{ item.name }}/fullchain.pem chained.crt
+cat signed.crt certs/{{ item.name }}/chain.pem > chained.crt
 cat chained.crt domain.key > chained_cert+key.pem
 
 {% if item.user is defined %}
