@@ -22,6 +22,9 @@ trap handle_error ERR
 
 cd {{ letsencrypt_dir }}/{{ item.name }}
 
+force=""
+[[ -f "force" ]] && force="--force" && rm -f force
+
 {% if item.challenge|default('http-01') == 'http-01' %}
 if ! lsof -i:80 > /dev/null; then
     mkdir -p serve/.well-known
@@ -38,7 +41,7 @@ fi
     {% for subdomain in item.subdomains|selectattr('name', 'undefined') %}--domain {{ subdomain }} {% endfor %} \
     --hook ./multihook.sh \
     --algo {{ item.key_algo|default(letsencrypt_key_algo) }} \
-    --challenge {{ item.challenge|default('http-01') }}
+    --challenge {{ item.challenge|default('http-01') }} $force
 
 cp certs/{{ item.name }}/cert.pem signed.crt
 cp certs/{{ item.name }}/privkey.pem domain.key
