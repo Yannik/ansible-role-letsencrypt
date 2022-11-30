@@ -60,6 +60,7 @@
     dest: "{{ letsencrypt_dir }}/{{ item.name }}/acme-dns-hook.sh"
     mode: u+x
   when: item.subdomains|selectattr('acme_domain_id', 'defined')|list|length > 0
+        or 'acme_domain_id' in item
   with_items: "{{ letsencrypt_certs }}"
 
 - name: Create multihook script
