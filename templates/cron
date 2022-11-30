@@ -1,1 +1,1 @@
-36 3 * * * root {% for cert in letsencrypt_certs %}chronic -e {{ letsencrypt_dir }}/{{ cert.name }}/renew.sh{% if not loop.last %} && {% endif %}{% endfor %}
+36 3 * * * root {% for cert in letsencrypt_certs %}chronic -e {{ letsencrypt_dir }}/{{ cert.name }}/renew.sh{% if not loop.last %}; {% endif %}{% endfor %}
