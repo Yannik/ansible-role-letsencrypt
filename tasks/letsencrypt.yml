@@ -70,24 +70,20 @@
     mode: u+x
   with_items: "{{ letsencrypt_certs }}"
 
-- name: Check if custom hooks exist
-  local_action:
-    module: stat
-    path: "{{ letsencrypt_hooks_path }}"
-  register: letsencrypt_custom_hook
-
 - name: Create custom hook dir
   file:
     path: "{{ letsencrypt_dir }}/hooks"
     state: directory
-  when: letsencrypt_custom_hook.stat.exists
+  when: letsencrypt_hooks_path is directory
 
 - name: Copy custom hooks
-  copy:
-    src: "{{ letsencrypt_hooks_path }}"
-    dest: "{{ letsencrypt_dir }}/hooks"
-    mode: +rx
-  when: letsencrypt_custom_hook.stat.exists
+  template:
+    src: "{{ item }}"
+    dest: "{{ letsencrypt_dir }}/hooks/"
+    mode: 0770
+  with_fileglob:
+    - "{{ letsencrypt_hooks_path }}/*"
+  when: letsencrypt_hooks_path is directory
 
 - name: Create renew script
   template: src=renew.sh dest={{ letsencrypt_dir }}/{{ item.name }}/renew.sh mode=o+x
