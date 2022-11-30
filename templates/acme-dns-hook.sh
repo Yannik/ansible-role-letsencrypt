@@ -14,7 +14,7 @@ case "$ACTION" in
                   -H "X-Api-User: {{ subdomain.acme_user }}" \
                   -H "X-Api-Key: {{ subdomain.acme_pass }}" \
                   -d "{\"subdomain\": \"{{ subdomain.acme_domain_id }}\", \"txt\": \"$TOKEN\"}" \
-                  $SERVER)
+                  $SERVER/update)
 		if echo $result | jq -e '.error' > /dev/null; then
 		    echo "Error: $result"
 		    exit 1
